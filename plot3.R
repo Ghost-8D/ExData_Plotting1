@@ -16,43 +16,32 @@ if (!file.exists(file)){
 }
 
 # Read data from file
-data <- fread(file, header=TRUE, sep=";", na.strings = "?")
+data <- fread(file, header=TRUE, sep=";", na.strings = "?",
+              colClasses = c("character", "character", "numeric", "numeric", 
+                             "numeric", "numeric", "numeric", "numeric", "numeric"))
 data <- as_tibble(data)
 
-# Convert string date to Date object
-data$Date <- as.Date(data$Date, format = "%d/%m/%Y")
-
 # Get only data between dates 2007-02-01 and 2007-02-02
-target_data <- subset(data, Date <= "2007-02-02" & Date >= "2007-02-01")
+target_data <- subset(data, Date == "2/2/2007" | Date == "1/2/2007")
 
 # Remove initial dataset to free memory
 rm(data)
 
-# Convert column to numeric so that it can be used in plots
-target_data$Global_active_power <- as.numeric(target_data$Global_active_power)
+# Add column with datetime
 target_data$Full_Date <- strptime(paste(target_data$Date, target_data$Time), 
-                                  format = "%Y-%m-%d %H:%M:%S")
-
+                                  format = "%d/%m/%Y %H:%M:%S")
 
 # Create a PNG device to save the plot with shape 480x480 pixels
 png(filename = "plot3.png", width = 480, height = 480)
 par(bg = NA)
 # Add the line for Sub_metering_1 
-plot(target_data$Full_Date, target_data$Sub_metering_1, pch=NA, xlab=NA, 
+plot(target_data$Full_Date, target_data$Sub_metering_1, xlab=NA, type="l",
      ylab="Energy sub metering")
-lines(target_data$Full_Date, target_data$Sub_metering_1, 
-      xlim=range(target_data$Full_Date), 
-      ylim=range(target_data$Sub_metering_1), pch=16, col="black")
 # Add the line for Sub_metering_2
-points(target_data$Full_Date, target_data$Sub_metering_2, pch=NA)
-lines(target_data$Full_Date, target_data$Sub_metering_2, 
-      xlim=range(target_data$Full_Date), 
-      ylim=range(target_data$Sub_metering_2), pch=16, col="red")
+points(target_data$Full_Date, target_data$Sub_metering_2, type="l", col="red")
 # Add the line for Sub_metering_3
-points(target_data$Full_Date, target_data$Sub_metering_3, pch=NA)
-lines(target_data$Full_Date, target_data$Sub_metering_3, 
-      xlim=range(target_data$Full_Date), 
-      ylim=range(target_data$Sub_metering_3), pch=16, col="blue")
+points(target_data$Full_Date, target_data$Sub_metering_3, type="l", col="blue")
+
 # Add legend
 legend("topright", legend=c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"), 
        col=c("black", "red", "blue"), lty=c(1, 1, 1))

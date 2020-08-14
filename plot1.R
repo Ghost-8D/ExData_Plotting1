@@ -15,25 +15,22 @@ if (!file.exists(file)){
 }
 
 # Read data from file
-data <- fread(file, header=TRUE, sep=";", na.strings = "?")
+data <- fread(file, header=TRUE, sep=";", na.strings = "?", 
+              colClasses = c("character", "character", "numeric", "numeric", 
+                             "numeric", "numeric", "numeric", "numeric", "numeric"))
 data <- as_tibble(data)
 
-# Convert string date to Date object
-data$Date <- as.Date(data$Date, format = "%d/%m/%Y")
-
 # Get only data between dates 2007-02-01 and 2007-02-02
-target_data <- subset(data, Date <= "2007-02-02" & Date >= "2007-02-01")
+target_data <- subset(data, Date == "2/2/2007" | Date == "1/2/2007")
 
 # Remove initial dataset to free memory
 rm(data)
 
-# Convert column to numeric so that it can be used in plots
-target_data$Global_active_power <- as.numeric(target_data$Global_active_power)
-
 # Create a PNG device to save the plot with shape 480x480 pixels
-png(filename = "plot1.png", width = 480, height = 480, bg = )
+png(filename = "plot1.png", width = 480, height = 480)
 par(bg = NA)
-hist(target_data$Global_active_power, xlab = "Global Active Power (kilowatts)", col = "red", main = "Global Active Power")
+hist(target_data$Global_active_power, xlab = "Global Active Power (kilowatts)", 
+     col = "red", main = "Global Active Power")
 dev.off()
 
 # Cleanup

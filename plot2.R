@@ -16,34 +16,27 @@ if (!file.exists(file)){
 }
 
 # Read data from file
-data <- fread(file, header=TRUE, sep=";", na.strings = "?")
+data <- fread(file, header=TRUE, sep=";", na.strings = "?",
+              colClasses = c("character", "character", "numeric", "numeric", 
+                             "numeric", "numeric", "numeric", "numeric", "numeric"))
 data <- as_tibble(data)
 
-# Convert string date to Date object
-data$Date <- as.Date(data$Date, format = "%d/%m/%Y")
-
 # Get only data between dates 2007-02-01 and 2007-02-02
-target_data <- subset(data, Date <= "2007-02-02" & Date >= "2007-02-01")
+target_data <- subset(data, Date == "2/2/2007" | Date == "1/2/2007")
 
 # Remove initial dataset to free memory
 rm(data)
 
-# Convert column to numeric so that it can be used in plots
-target_data$Global_active_power <- as.numeric(target_data$Global_active_power)
+# Add column with datetime
 target_data$Full_Date <- strptime(paste(target_data$Date, target_data$Time), 
-                                  format = "%Y-%m-%d %H:%M:%S")
-
+                                  format = "%d/%m/%Y %H:%M:%S")
 
 # Create a PNG device to save the plot with shape 480x480 pixels
 png(filename = "plot2.png", width = 480, height = 480)
 par(bg = NA)
-# Add the data points without displaying them
+# Add the data points and connect them with line
 plot(target_data$Full_Date, target_data$Global_active_power, pch=NA, xlab = NA, 
-     ylab="Global Active Power (kilowatts)")
-# Draw the line between the points
-lines(target_data$Full_Date, target_data$Global_active_power, 
-      xlim=range(target_data$Full_Date), 
-      ylim=range(target_data$Global_active_power), pch=16)
+     ylab="Global Active Power (kilowatts)", type="l")
 dev.off()
 
 # Cleanup
