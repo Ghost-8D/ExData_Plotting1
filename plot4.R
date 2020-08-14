@@ -33,10 +33,21 @@ target_data$Global_active_power <- as.numeric(target_data$Global_active_power)
 target_data$Full_Date <- strptime(paste(target_data$Date, target_data$Time), 
                                   format = "%Y-%m-%d %H:%M:%S")
 
-
 # Create a PNG device to save the plot with shape 480x480 pixels
-png(filename = "plot3.png", width = 480, height = 480)
-par(bg = NA)
+png(filename = "plot4.png", width = 480, height = 480)
+par(bg = NA) # For transparent background
+
+# Prepare a 2x2 grid for the 4 plots
+par(mfcol=c(2,2))
+
+# Add top left plot
+plot(target_data$Full_Date, target_data$Global_active_power, pch=NA, xlab = NA, 
+     ylab="Global Active Power (kilowatts)")
+lines(target_data$Full_Date, target_data$Global_active_power, 
+      xlim=range(target_data$Full_Date), 
+      ylim=range(target_data$Global_active_power), pch=16)
+
+# Add bottom left plot
 # Add the line for Sub_metering_1 
 plot(target_data$Full_Date, target_data$Sub_metering_1, pch=NA, xlab=NA, 
      ylab="Energy sub metering")
@@ -55,7 +66,20 @@ lines(target_data$Full_Date, target_data$Sub_metering_3,
       ylim=range(target_data$Sub_metering_3), pch=16, col="blue")
 # Add legend
 legend("topright", legend=c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"), 
-       col=c("black", "red", "blue"), lty=c(1, 1, 1))
+       col=c("black", "red", "blue"), lty=c(1, 1, 1), cex=0.9, box.lty=0)
+
+# Add top right plot
+plot(target_data$Full_Date, target_data$Voltage, pch=NA, xlab="datetime", ylab="Voltage")
+lines(target_data$Full_Date, target_data$Voltage, 
+      xlim=range(target_data$Full_Date), 
+      ylim=range(target_data$Voltage), pch=16, col="black")
+
+# Add bottom right plot
+plot(target_data$Full_Date, target_data$Global_reactive_power, pch=NA, xlab="datetime", 
+     ylab="Global reactive power")
+lines(target_data$Full_Date, target_data$Global_reactive_power, 
+      xlim=range(target_data$Full_Date), 
+      ylim=range(target_data$Global_reactive_power), pch=16, col="black")
 dev.off()
 
 # Cleanup
