@@ -1,6 +1,7 @@
 # Load libraries
 library(data.table)
 library(tidyr)
+library(lubridate)
 
 # Download the dataset from the url if it does not exist
 file <- "household_power_consumption.txt"
@@ -29,11 +30,20 @@ rm(data)
 
 # Convert column to numeric so that it can be used in plots
 target_data$Global_active_power <- as.numeric(target_data$Global_active_power)
+target_data$Full_Date <- strptime(paste(target_data$Date, target_data$Time), 
+                                  format = "%Y-%m-%d %H:%M:%S")
+
 
 # Create a PNG device to save the plot with shape 480x480 pixels
-png(filename = "plot1.png", width = 480, height = 480, bg = )
+png(filename = "plot2.png", width = 480, height = 480)
 par(bg = NA)
-hist(target_data$Global_active_power, xlab = "Global Active Power (kilowatts)", col = "red", main = "Global Active Power")
+# Add the data points without displaying them
+plot(target_data$Full_Date, target_data$Global_active_power, pch=NA, xlab = NA, 
+     ylab="Global Active Power (kilowatts)")
+# Draw the line between the points
+lines(target_data$Full_Date, target_data$Global_active_power, 
+      xlim=range(target_data$Full_Date), 
+      ylim=range(target_data$Global_active_power), pch=16)
 dev.off()
 
 # Cleanup
